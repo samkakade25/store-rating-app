@@ -4,32 +4,48 @@ import pool from '../db.js';
 import { body, validationResult } from 'express-validator';
 
 
-export const signup = [
-    body('name').isLength({ min: 20, max: 60 }),
-    body('email').isEmail(),
-    body('address').isLength({ max: 400 }),
-    body('password').isLength({ min: 8, max: 16}).matches(/^(?=.*[A-Z])(?=.*[!@#$%^&*])/),
+export const signup = async (req, res) => {
+    const { name, email, address, password, role } = req.body;
 
-    async (req, res) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty())
-            return res.status(400).json({ errors: errors.array() });
-
-        const { name, email, address, password } = req.body;
-        try {
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const result = await pool.query(
-                `INSERT INTO users (name, email, password, address, role) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, role`,
-            [name, email, hashedPassword, address, 'user']
-        );
-            const user = result.rows[0];
-            const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-            res.status(201).json({ token, user });
-        } catch (error) {
-            res.status(500).json({ message: 'Error signing up' });
+    try {
+        // Validate input
+        if (!name || name.length < 20 || name.length > 60) {
+            return res.status(400).json({ message: 'Name must be 20-60 characters' });
         }
+        if (!email || !email.match(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
+            return res.status(400).json({ message: 'Invalid email format' });
+        }
+        if (address && address.length > 400) {
+            return res.status(400).json({ message: 'Address must be under 400 characters' });
+        }
+        if (!password || !password.match(/^(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,16}$/)) {
+            return res.status(400).json({ message: 'Password must be 8-16 characters with at least one uppercase letter and one special character' });
+        }
+        if (!['user', 'store_owner'].includes(role)) {
+            return res.status(400).json({ message: 'Invalid role. Only user or store_owner allowed' });
+        }
+
+        // Check if email exists
+        const [existingUser] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+        if (existingUser.length > 0) {
+            return res.status(400).json({ message: 'Email already exists' });
+        }
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Insert user
+        const [result] = await db.query(
+            'INSERT INTO users (name, email, address, password, role) VALUES (?, ?, ?, ?, ?)',
+            [name, email, address || null, hashedPassword, role]
+        );
+
+        res.status(201).json({ message: 'User created successfully' });
+    } catch (error) {
+        console.error('Signup error:', error);
+        res.status(500).json({ message: 'Server error' });
     }
-];
+};
 
 export const login = async (req, res) => {
     const { email, password } = req.body;
