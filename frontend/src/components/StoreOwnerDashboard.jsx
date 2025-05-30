@@ -72,7 +72,7 @@ const StoreOwnerDashboard = () => {
 
         try {
             console.log('Adding store:', newStore); // Debug
-            await axios.post(`${process.env.VITE_API_URL}/store-owner/stores`, newStore, {
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/store-owner/stores`, newStore, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             fetchStores();
@@ -125,7 +125,7 @@ const StoreOwnerDashboard = () => {
                 </button>
             </form>
 
-            <h3 className="text-2xl font-semibold text-gray-800 mb-4">My Stores</h3>
+            {/* <h3 className="text-2xl font-semibold text-gray-800 mb-4">My Stores</h3>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6 bg-white p-6 rounded-lg shadow-md">
                 <input
                     type="text"
@@ -154,7 +154,7 @@ const StoreOwnerDashboard = () => {
                 >
                     Apply Filters
                 </button>
-            </div>
+            </div> */}
             <div className="overflow-x-auto bg-white rounded-lg shadow-md">
                 <table className="w-full">
                     <thead>
@@ -175,7 +175,7 @@ const StoreOwnerDashboard = () => {
                                 <td>{store.name}</td>
                                 <td>{store.email}</td>
                                 <td>{store.address || 'N/A'}</td>
-                                <td>{store.rating ? parseFloat(store.rating).toFixed(1) : 'N/A'}</td>
+                                <td>{store.average_rating !== undefined && store.average_rating !== null ? parseFloat(store.average_rating).toFixed(1) : 'N/A'}</td>
                             </tr>
                         ))}
                     </tbody>

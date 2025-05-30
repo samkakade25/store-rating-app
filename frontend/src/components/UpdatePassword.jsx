@@ -24,7 +24,7 @@ const UpdatePassword = () => {
 
         try {
             await axios.put(
-                `${process.env.VITE_API_URL}/auth/password`,
+                `${import.meta.env.VITE_API_URL}/api/auth/password`,
                 { password },
                 { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
             );

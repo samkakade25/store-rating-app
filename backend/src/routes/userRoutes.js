@@ -8,18 +8,33 @@ const router = express.Router();
 router.get('/stores', authMiddleware, async (req, res) => {
     try {
         const userId = req.user.id;
-        const stores = await pool.query(
-            `SELECT s.id, s.name, s.address,
+        const { name, address, sortBy = 'name', order = 'asc' } = req.query;
+
+        let query = `
+            SELECT s.id, s.name, s.address,
                 COALESCE(AVG(r.rating), 0) AS overall_rating,
                 (
                     SELECT rating FROM ratings WHERE user_id = $1 AND store_id = s.id
                 ) AS user_rating
             FROM stores s
             LEFT JOIN ratings r ON s.id = r.store_id
-            GROUP BY s.id, s.name, s.address
-            ORDER BY s.name ASC`,
-            [userId]
-        );
+            WHERE 1=1
+        `;
+        const params = [userId];
+        let paramIndex = 2;
+
+        if (name) {
+            query += ` AND s.name ILIKE $${paramIndex++}`;
+            params.push(`%${name}%`);
+        }
+        if (address) {
+            query += ` AND s.address ILIKE $${paramIndex++}`;
+            params.push(`%${address}%`);
+        }
+
+        query += ` GROUP BY s.id, s.name, s.address ORDER BY s.${sortBy} ${order.toUpperCase()}`;
+
+        const stores = await pool.query(query, params);
         res.json(stores.rows);
     } catch (error) {
         console.error('Error fetching stores:', error);
