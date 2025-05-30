@@ -1,16 +1,16 @@
 import bcrypt from 'bcrypt';
-import db from '../db.js';
+import pool from '../db.js';
 
 export const getDashboard = async (req, res) => {
     try {
-        const [users] = await db.query('SELECT COUNT(*) AS count FROM users');
-        const [stores] = await db.query('SELECT COUNT(*) AS count FROM stores');
-        const [ratings] = await db.query('SELECT COUNT(*) AS count FROM ratings');
+        const usersResult = await pool.query('SELECT COUNT(*) AS count FROM users');
+        const storesResult = await pool.query('SELECT COUNT(*) AS count FROM stores');
+        const ratingsResult = await pool.query('SELECT COUNT(*) AS count FROM ratings');
 
         res.json({
-            totalUsers: users[0].count,
-            totalStores: stores[0].count,
-            totalRatings: ratings[0].count,
+            totalUsers: usersResult.rows[0].count,
+            totalStores: storesResult.rows[0].count,
+            totalRatings: ratingsResult.rows[0].count,
         });
     } catch (error) {
         console.error('Dashboard error:', error);
@@ -40,8 +40,8 @@ export const addUser = async (req, res) => {
         }
 
         // Check if email exists
-        const [existingUser] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-        if (existingUser.length > 0) {
+        const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (existingUser.rows.length > 0) {
             return res.status(400).json({ message: 'Email already exists' });
         }
 
@@ -49,8 +49,8 @@ export const addUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Insert user
-        await db.query(
-            'INSERT INTO users (name, email, address, password, role) VALUES (?, ?, ?, ?, ?)',
+        await pool.query(
+            'INSERT INTO users (name, email, address, password, role) VALUES ($1, $2, $3, $4, $5)',
             [name, email, address || null, hashedPassword, role]
         );
 
@@ -80,20 +80,20 @@ export const addStore = async (req, res) => {
         }
 
         // Check if owner exists and is a store_owner
-        const [owner] = await db.query('SELECT * FROM users WHERE id = ? AND role = ?', [owner_id, 'store_owner']);
-        if (owner.length === 0) {
+        const owner = await pool.query('SELECT * FROM users WHERE id = $1 AND role = $2', [owner_id, 'store_owner']);
+        if (owner.rows.length === 0) {
             return res.status(400).json({ message: 'Invalid store owner' });
         }
 
         // Check if email exists
-        const [existingStore] = await db.query('SELECT * FROM stores WHERE email = ?', [email]);
-        if (existingStore.length > 0) {
+        const existingStore = await pool.query('SELECT * FROM stores WHERE email = $1', [email]);
+        if (existingStore.rows.length > 0) {
             return res.status(400).json({ message: 'Store email already exists' });
         }
 
         // Insert store
-        await db.query(
-            'INSERT INTO stores (name, email, address, owner_id) VALUES (?, ?, ?, ?)',
+        await pool.query(
+            'INSERT INTO stores (name, email, address, owner_id) VALUES ($1, $2, $3, $4)',
             [name, email, address || null, owner_id]
         );
 
@@ -110,28 +110,29 @@ export const getUsers = async (req, res) => {
     try {
         let query = 'SELECT id, name, email, address, role FROM users WHERE 1=1';
         const params = [];
+        let paramIndex = 1;
 
         if (name) {
-            query += ' AND name LIKE ?';
+            query += ` AND name ILIKE $${paramIndex++}`;
             params.push(`%${name}%`);
         }
         if (email) {
-            query += ' AND email LIKE ?';
+            query += ` AND email ILIKE $${paramIndex++}`;
             params.push(`%${email}%`);
         }
         if (address) {
-            query += ' AND address LIKE ?';
+            query += ` AND address ILIKE $${paramIndex++}`;
             params.push(`%${address}%`);
         }
         if (role) {
-            query += ' AND role = ?';
+            query += ` AND role = $${paramIndex++}`;
             params.push(role);
         }
 
         query += ` ORDER BY ${sortBy} ${order.toUpperCase()}`;
 
-        const [users] = await db.query(query, params);
-        res.json(users);
+        const users = await pool.query(query, params);
+        res.json(users.rows);
     } catch (error) {
         console.error('Get users error:', error);
         res.status(500).json({ message: 'Server error' });
@@ -149,24 +150,25 @@ export const getStores = async (req, res) => {
             WHERE 1=1
         `;
         const params = [];
+        let paramIndex = 1;
 
         if (name) {
-            query += ' AND s.name LIKE ?';
+            query += ` AND s.name ILIKE $${paramIndex++}`;
             params.push(`%${name}%`);
         }
         if (email) {
-            query += ' AND s.email LIKE ?';
+            query += ` AND s.email ILIKE $${paramIndex++}`;
             params.push(`%${email}%`);
         }
         if (address) {
-            query += ' AND s.address LIKE ?';
+            query += ` AND s.address ILIKE $${paramIndex++}`;
             params.push(`%${address}%`);
         }
 
         query += ` GROUP BY s.id, s.name, s.email, s.address ORDER BY ${sortBy} ${order.toUpperCase()}`;
 
-        const [stores] = await db.query(query, params);
-        res.json(stores);
+        const stores = await pool.query(query, params);
+        res.json(stores.rows);
     } catch (error) {
         console.error('Get stores error:', error);
         res.status(500).json({ message: 'Server error' });

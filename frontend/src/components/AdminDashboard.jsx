@@ -160,7 +160,7 @@ const AdminDashboard = () => {
         if (!validateStoreForm()) return;
 
         try {
-            await axios.post(`${process.env.VITE_API_URL}/admin/stores`, newStore, {
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/stores`, newStore, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
             fetchStores();

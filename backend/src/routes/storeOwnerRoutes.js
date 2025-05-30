@@ -1,5 +1,5 @@
 import express from 'express';
-import { authMiddleware } from '../middleware/auth.js';
+import { default as authMiddleware } from '../middleware/authMiddleware.js';
 import pool from '../db.js';
 
 const router = express.Router();

@@ -26,8 +26,8 @@ export const signup = async (req, res) => {
         }
 
         // Check if email exists
-        const [existingUser] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-        if (existingUser.length > 0) {
+        const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (existingUser.rows.length > 0) {
             return res.status(400).json({ message: 'Email already exists' });
         }
 
@@ -35,8 +35,8 @@ export const signup = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Insert user
-        const [result] = await db.query(
-            'INSERT INTO users (name, email, address, password, role) VALUES (?, ?, ?, ?, ?)',
+        await pool.query(
+            'INSERT INTO users (name, email, address, password, role) VALUES ($1, $2, $3, $4, $5)',
             [name, email, address || null, hashedPassword, role]
         );
 

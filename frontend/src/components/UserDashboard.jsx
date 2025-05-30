@@ -5,10 +5,11 @@ const UserDashboard = () => {
     const [stores, setStores] = useState([]);
     const [filters, setFilters] = useState({ name: '', address: '', sortBy: 'name', order: 'asc' });
     const [error, setError] = useState('');
+    const [submitting, setSubmitting] = useState({}); // storeId: true/false
 
     useEffect(() => {
         fetchStores();
-    }, [filters]); // Add filters as dependency
+    }, [filters]);
 
     const fetchStores = async () => {
         try {
@@ -23,6 +24,28 @@ const UserDashboard = () => {
         } catch (err) {
             console.error('Error fetching stores:', err);
             setError(err.response?.data?.message || 'Error fetching stores');
+        }
+    };
+
+    const handleRatingChange = async (storeId, rating) => {
+        setSubmitting((prev) => ({ ...prev, [storeId]: true }));
+        try {
+            await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/user/stores/${storeId}/rate`,
+                { rating },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            fetchStores(); // Refresh ratings
+        } catch (err) {
+            console.error('Error submitting rating:', err);
+            setError(err.response?.data?.message || 'Error submitting rating');
+        } finally {
+            setSubmitting((prev) => ({ ...prev, [storeId]: false }));
         }
     };
 
@@ -55,7 +78,27 @@ const UserDashboard = () => {
                     <div key={store.id} className="border p-4 rounded shadow">
                         <h2 className="text-xl font-semibold">{store.name}</h2>
                         <p className="text-gray-600">{store.address}</p>
-                        <p className="text-gray-600">Rating: {store.average_rating || 'No ratings yet'}</p>
+                        <p className="text-gray-600">
+                            Overall Rating: {store.overall_rating ? parseFloat(store.overall_rating).toFixed(2) : 'No ratings yet'}
+                        </p>
+                        <p className="text-gray-600">
+                            Your Rating: {store.user_rating ? store.user_rating : 'Not rated'}
+                        </p>
+                        <div className="flex items-center gap-2 mt-2">
+                            <label htmlFor={`rating-${store.id}`}>Rate:</label>
+                            <select
+                                id={`rating-${store.id}`}
+                                value={store.user_rating || ''}
+                                onChange={e => handleRatingChange(store.id, Number(e.target.value))}
+                                disabled={submitting[store.id]}
+                            >
+                                <option value="">Select</option>
+                                {[1,2,3,4,5].map(n => (
+                                    <option key={n} value={n}>{n}</option>
+                                ))}
+                            </select>
+                            {submitting[store.id] && <span className="text-sm text-gray-400">Saving...</span>}
+                        </div>
                     </div>
                 ))}
             </div>

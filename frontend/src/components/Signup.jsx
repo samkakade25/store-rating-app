@@ -2,7 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const Signup = () => {
+const Signup = ({ onSignup } ) => {
     const [formData, setFormData] = useState({ name: '', email: '', address: '', password: '', role: 'user' });
     const [error, setError] = useState('');
     const navigate = useNavigate();
@@ -41,6 +41,8 @@ const Signup = () => {
         try {
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/signup`, formData);
             console.log('Signup response:', response.data); // Debug
+            localStorage.setItem('token', response.data.token);
+            onSignup(response.data.user);
             navigate('/login');
         } catch (err) {
             console.error('Signup error:', err.response?.data || err.message); // Debug

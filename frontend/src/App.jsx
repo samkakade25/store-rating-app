@@ -10,15 +10,24 @@ import Navbar from './components/Navbar';
 import UpdatePassword from './components/UpdatePassword';
 import './index.css';
 
+function safeParseUser() {
+    const userStr = localStorage.getItem('user');
+    try {
+        return userStr && userStr !== 'undefined' ? JSON.parse(userStr) : null;
+    } catch {
+        return null;
+    }
+}
+
 function App() {
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || null);
+    const [user, setUser] = useState(safeParseUser());
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         // Check authentication status on mount
         const checkAuth = () => {
             const token = localStorage.getItem('token');
-            const userData = JSON.parse(localStorage.getItem('user'));
+            const userData = safeParseUser();
             if (!token || !userData) {
                 handleLogout();
             }
@@ -57,7 +66,7 @@ function App() {
                     />
                     <Route 
                         path="/signup" 
-                        element={!user ? <Signup /> : <Navigate to="/dashboard" />} 
+                        element={!user ? <Signup onSignup={handleLogin} /> : <Navigate to="/dashboard" />} 
                     />
                     <Route
                         path="/dashboard"
