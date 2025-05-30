@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 
 const UserDashboard = () => {
@@ -7,9 +7,16 @@ const UserDashboard = () => {
     const [error, setError] = useState('');
     const [submitting, setSubmitting] = useState({}); // storeId: true/false
 
+    // Debounce logic for filters
+    const debounceTimeout = useRef();
+
     useEffect(() => {
-        fetchStores();
-    }, [filters]);
+        if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+        debounceTimeout.current = setTimeout(() => {
+            fetchStores();
+        }, 400);
+        return () => clearTimeout(debounceTimeout.current);
+    }, [filters.name, filters.address, filters.sortBy, filters.order]);
 
     const fetchStores = async () => {
         try {

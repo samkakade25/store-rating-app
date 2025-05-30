@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 
 const AdminDashboard = () => {
@@ -10,6 +10,9 @@ const AdminDashboard = () => {
     const [newStore, setNewStore] = useState({ name: '', email: '', address: '', owner_id: '' });
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+
+    // Debounce logic for filters
+    const debounceTimeout = useRef();
 
     useEffect(() => {
         const loadDashboard = async () => {
@@ -28,6 +31,15 @@ const AdminDashboard = () => {
         };
         loadDashboard();
     }, []);
+
+    useEffect(() => {
+        if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+        debounceTimeout.current = setTimeout(() => {
+            fetchStores();
+            fetchUsers();
+        }, 400);
+        return () => clearTimeout(debounceTimeout.current);
+    }, [filters.name, filters.email, filters.address, filters.role, filters.sortBy, filters.order]);
 
     const validateUserForm = () => {
         if (newUser.name.length < 20 || newUser.name.length > 60) {
@@ -109,7 +121,8 @@ const AdminDashboard = () => {
             const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/users`, {
                 headers: { 
                     'Authorization': `Bearer ${token}`
-                }
+                },
+                params: filters,
             });
 
             if (Array.isArray(response.data)) {
@@ -313,12 +326,6 @@ const AdminDashboard = () => {
                     value={filters.address}
                     onChange={(e) => setFilters({ ...filters, address: e.target.value })}
                 />
-                <button
-                    className="bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition"
-                    onClick={fetchStores}
-                >
-                    Apply Filters
-                </button>
             </div>
             <div className="overflow-x-auto bg-white rounded-lg shadow-md">
                 <table className="w-full">
@@ -380,12 +387,6 @@ const AdminDashboard = () => {
                     <option value="user">User</option>
                     <option value="store_owner">Store Owner</option>
                 </select>
-                <button
-                    className="bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition"
-                    onClick={fetchUsers}
-                >
-                    Apply Filters
-                </button>
             </div>
             <div className="overflow-x-auto bg-white rounded-lg shadow-md">
                 <table className="w-full">
@@ -399,7 +400,7 @@ const AdminDashboard = () => {
                             </th>
                             <th>Address</th>
                             <th>Role</th>
-                            <th>Rating</th>
+                            {/* <th>Rating</th> */}
                         </tr>
                     </thead>
                     <tbody>
@@ -409,9 +410,9 @@ const AdminDashboard = () => {
                                 <td>{user.email}</td>
                                 <td>{user.address}</td>
                                 <td>{user.role}</td>
-                                <td>
+                                {/* <td>
                                     {user.rating && user.role === 'store_owner' ? parseFloat(user.rating).toFixed(1) : 'N/A'}
-                                </td>
+                                </td> */}
                             </tr>
                         ))}
                     </tbody>
