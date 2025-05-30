@@ -1,7 +1,7 @@
 import express from 'express';
 import { getDashboard, addUser, addStore, getUsers, getStores } from '../controllers/adminController.js';
 import { default as authMiddleware } from '../middleware/authMiddleware.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import pool from '../db.js';
 
 const router = express.Router();
