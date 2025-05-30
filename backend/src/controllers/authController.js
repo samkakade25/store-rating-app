@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjsjs';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import pool from '../db.js';
 import { body, validationResult } from 'express-validator';
