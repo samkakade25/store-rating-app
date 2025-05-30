@@ -6,7 +6,10 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: 'https://store-rating-app-git-main-samkakade25s-projects.vercel.app',
+  credentials: true // if using cookies or auth headers
+}));
 app.use(express.json());
 
 // Mount auth routes with the correct prefix
