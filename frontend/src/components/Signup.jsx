@@ -104,8 +104,8 @@ const Signup = ({ onSignup } ) => {
                         />
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-medium mb-2">Role</label>
-                        <select
+                        {/* <label className="block text-gray-700 font-medium mb-2">Role</label> */}
+                        {/* <select
                             name="role"
                             className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             value={formData.role}
@@ -115,7 +115,7 @@ const Signup = ({ onSignup } ) => {
                             <option value="user">User</option>
                             <option value="store_owner">Store Owner</option>
                             <option value="admin">Admin</option>
-                        </select>
+                        </select> */}
                     </div>
                     <button
                         type="submit"
