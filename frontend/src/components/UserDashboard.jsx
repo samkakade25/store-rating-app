@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
+import StarRating from './StarRating';
 
 const UserDashboard = () => {
     const [stores, setStores] = useState([]);
@@ -80,31 +81,26 @@ const UserDashboard = () => {
             </div>
 
             {/* Stores List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {stores.map((store) => (
-                    <div key={store.id} className="border p-4 rounded shadow">
-                        <h2 className="text-xl font-semibold">{store.name}</h2>
-                        <p className="text-gray-600">{store.address}</p>
-                        <p className="text-gray-600">
-                            Overall Rating: {store.overall_rating ? parseFloat(store.overall_rating).toFixed(2) : 'No ratings yet'}
-                        </p>
-                        <p className="text-gray-600">
-                            Your Rating: {store.user_rating ? store.user_rating : 'Not rated'}
-                        </p>
+                    <div key={store.id} className="bg-white border border-gray-200 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow flex flex-col gap-3">
+                        <div className="flex items-center justify-between mb-2">
+                            <h2 className="text-xl font-bold text-gray-800">{store.name}</h2>
+                            <div className="flex items-center gap-1">
+                                <StarRating value={store.overall_rating ? Math.round(store.overall_rating) : 0} readOnly size={20} />
+                                <span className="ml-1 text-yellow-600 font-semibold text-sm">{store.overall_rating ? parseFloat(store.overall_rating).toFixed(2) : 'No ratings'}</span>
+                            </div>
+                        </div>
+                        <p className="text-gray-500 mb-2">{store.address}</p>
                         <div className="flex items-center gap-2 mt-2">
-                            <label htmlFor={`rating-${store.id}`}>Rate:</label>
-                            <select
-                                id={`rating-${store.id}`}
-                                value={store.user_rating || ''}
-                                onChange={e => handleRatingChange(store.id, Number(e.target.value))}
-                                disabled={submitting[store.id]}
-                            >
-                                <option value="">Select</option>
-                                {[1,2,3,4,5].map(n => (
-                                    <option key={n} value={n}>{n}</option>
-                                ))}
-                            </select>
-                            {submitting[store.id] && <span className="text-sm text-gray-400">Saving...</span>}
+                            <span className="text-lg font-semibold text-indigo-700 tracking-wide drop-shadow-sm bg-indigo-50 px-2 py-1 rounded-md shadow-inner border border-indigo-100 mr-2 transition-all duration-200">Your Rating:</span>
+                            <StarRating
+                                value={store.user_rating || 0}
+                                onChange={rating => handleRatingChange(store.id, rating)}
+                                readOnly={submitting[store.id]}
+                                size={22}
+                            />
+                            {submitting[store.id] && <span className="text-sm text-gray-400 ml-2">Saving...</span>}
                         </div>
                     </div>
                 ))}
