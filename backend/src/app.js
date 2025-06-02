@@ -8,15 +8,16 @@ const app = express();
 
 app.use(cors({
     origin: 'https://store-rating-app-git-main-samkakade25s-projects.vercel.app',
-  credentials: true // if using cookies or auth headers
+    // origin: 'http://localhost:3000',
+  credentials: true 
 }));
 app.use(express.json());
 
-// Mount auth routes with the correct prefix
+
 app.use('/api/auth', authRoutes);
-// Mount admin routes with the correct prefix
+
 app.use('/api/admin', adminRoutes);
-// Mount store owner routes with the correct prefix
+
 app.use('/api/store-owner', storeOwnerRoutes);
 
 app.use('/api/user', userRoutes);
