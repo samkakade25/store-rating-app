@@ -22,9 +22,9 @@ store-rating-app/
 
 ## Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js (v14 or higher) or [Bun](https://bun.sh/) (v1.0 or higher)
 - PostgreSQL (v12 or higher)
-- npm or yarn package manager
+- npm, yarn, or bun package manager
 
 ## Quick Start
 
@@ -35,18 +35,32 @@ cd store-rating-app
 ```
 
 2. Set up the backend:
-```bash
-cd backend
-npm install
-npm run dev
-```
+   - Using npm:
+     ```bash
+     cd backend
+     npm install
+     npm run dev
+     ```
+   - Using Bun:
+     ```bash
+     cd backend
+     bun install
+     bun run dev
+     ```
 
 3. Set up the frontend:
-```bash
-cd frontend
-npm install
-npm run dev
-```
+   - Using npm:
+     ```bash
+     cd frontend
+     npm install
+     npm run dev
+     ```
+   - Using Bun:
+     ```bash
+     cd frontend
+     bun install
+     bun run dev
+     ```
 
 4. Access the application:
 - Frontend: http://localhost:3000
