@@ -43,20 +43,20 @@ const Login = ({ onLogin }) => {
                 {error && <div className="text-red-500 text-center mb-4">{error}</div>}
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="form-label">Email</label>
+                        <label className="block text-gray-700 font-medium mb-2">Email</label>
                         <input
                             type="email"
-                            className="text-input"
+                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
                     </div>
                     <div>
-                        <label className="form-label">Password</label>
+                        <label className="block text-gray-700 font-medium mb-2">Password</label>
                         <input
                             type="password"
-                            className="text-input"
+                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
@@ -64,7 +64,7 @@ const Login = ({ onLogin }) => {
                     </div>
                     <button
                         type="submit"
-                        className="form-button"
+                        className="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition"
                     >
                         Login
                     </button>

@@ -8,6 +8,7 @@ const app = express();
 
 app.use(cors({
     origin: 'https://store-rating-app-git-main-samkakade25s-projects.vercel.app',
+    // origin: 'http://localhost:3000',
   credentials: true 
 }));
 app.use(express.json());
