@@ -61,43 +61,43 @@ const Signup = ({ onSignup } ) => {
                 {error && <div className="text-red-500 text-center mb-4">{error}</div>}
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-gray-700 font-medium mb-2">Name</label>
+                        <label className='form-label'>Name</label>
                         <input
                             type="text"
                             name="name"
-                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="text-input"
                             value={formData.name}
                             onChange={handleChange}
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-medium mb-2">Email</label>
+                        <label className='form-label'>Email</label>
                         <input
                             type="email"
                             name="email"
-                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="text-input"
                             value={formData.email}
                             onChange={handleChange}
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-medium mb-2">Address</label>
+                        <label className='form-label'>Address</label>
                         <input
                             type="text"
                             name="address"
-                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="text-input"
                             value={formData.address}
                             onChange={handleChange}
                         />
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-medium mb-2">Password</label>
+                        <label className='form-label'>Password</label>
                         <input
                             type="password"
                             name="password"
-                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="text-input"
                             value={formData.password}
                             onChange={handleChange}
                             required
@@ -119,7 +119,7 @@ const Signup = ({ onSignup } ) => {
                     </div>
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                        className="form-button"
                     >
                         Signup
                     </button>

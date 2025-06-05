@@ -43,10 +43,10 @@ const UpdatePassword = () => {
                 {success && <div className="text-green-500 text-center mb-4">{success}</div>}
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-gray-700 font-medium mb-2">New Password</label>
+                        <label className="form-label">New Password</label>
                         <input
                             type="password"
-                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="text-input"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
@@ -54,7 +54,7 @@ const UpdatePassword = () => {
                     </div>
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                        className="form-button"
                     >
                         Update Password
                     </button>
